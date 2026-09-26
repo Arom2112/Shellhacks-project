@@ -1,0 +1,624 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="color-scheme" content="light dark" />
+  <link rel="icon" href="data:," />
+  <title>Hazard Routing Data Sources</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      color-scheme: light dark;
+      --bg: #f4f6f3;
+      --paper: #ffffff;
+      --paper-2: #e9ede8;
+      --ink: #151b18;
+      --muted: #56615b;
+      --line: #cfd6d1;
+      --line-strong: #aeb9b1;
+      --green: #0b6b4f;
+      --green-soft: #dceee7;
+      --orange: #bd4f14;
+      --orange-soft: #f9e6d8;
+      --red: #a2352c;
+      --red-soft: #f5dfdc;
+      --blue: #245f8b;
+      --blue-soft: #dfebf4;
+      --shadow: 0 16px 36px rgba(21, 27, 24, .08);
+      --radius-lg: 26px;
+      --radius-md: 16px;
+      --radius-sm: 10px;
+    }
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --bg: #101513;
+        --paper: #171e1b;
+        --paper-2: #202925;
+        --ink: #f0f4f1;
+        --muted: #a9b5ae;
+        --line: #34413b;
+        --line-strong: #53635b;
+        --green: #70d1ab;
+        --green-soft: #173e31;
+        --orange: #f5a368;
+        --orange-soft: #472c1d;
+        --red: #ef8b80;
+        --red-soft: #482523;
+        --blue: #80b9e2;
+        --blue-soft: #193449;
+        --shadow: 0 18px 46px rgba(0, 0, 0, .26);
+      }
+    }
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      min-width: 0;
+      background:
+        linear-gradient(var(--line) 1px, transparent 1px),
+        linear-gradient(90deg, var(--line) 1px, transparent 1px),
+        var(--bg);
+      background-size: 34px 34px;
+      color: var(--ink);
+      font-family: "IBM Plex Sans", sans-serif;
+      line-height: 1.55;
+    }
+    button, input { font: inherit; }
+    a { color: inherit; }
+    a:focus-visible, button:focus-visible { outline: 3px solid var(--orange); outline-offset: 3px; }
+    .page { width: min(1180px, calc(100% - 32px)); margin: 0 auto; padding: 30px 0 80px; }
+    .surface { background: var(--paper); border: 1px solid var(--line); box-shadow: var(--shadow); }
+    .hero {
+      position: relative;
+      overflow: hidden;
+      border-radius: var(--radius-lg);
+      padding: clamp(26px, 5vw, 64px);
+      display: grid;
+      grid-template-columns: minmax(0, 1.45fr) minmax(260px, .55fr);
+      gap: 38px;
+      align-items: end;
+    }
+    .hero::after {
+      content: "";
+      position: absolute;
+      top: 0; right: 0;
+      width: 10px; height: 100%;
+      background: repeating-linear-gradient(to bottom, var(--orange) 0 18px, transparent 18px 28px);
+    }
+    .hero-kicker, .eyebrow {
+      margin: 0 0 10px;
+      color: var(--green);
+      font: 600 12px/1.3 "IBM Plex Mono", monospace;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+    }
+    h1 { margin: 0; max-width: 820px; font-size: clamp(38px, 7vw, 76px); line-height: .98; letter-spacing: -.045em; }
+    .hero p.lede { margin: 24px 0 0; max-width: 760px; font-size: clamp(17px, 2vw, 21px); color: var(--muted); }
+    .verdict {
+      padding: 22px;
+      border-radius: var(--radius-md);
+      background: var(--green-soft);
+      border: 1px solid color-mix(in srgb, var(--green) 36%, var(--line));
+    }
+    .verdict strong { display: block; color: var(--green); font-size: 22px; margin-bottom: 6px; }
+    .verdict p { margin: 0; font-size: 14px; color: var(--ink); }
+    .facts { margin-top: 14px; display: grid; gap: 8px; }
+    .fact { display: flex; gap: 10px; align-items: baseline; font-size: 13px; }
+    .fact b { font: 600 12px/1.2 "IBM Plex Mono", monospace; color: var(--green); }
+
+    .jumpbar {
+      position: sticky;
+      top: 10px;
+      z-index: 20;
+      margin: 16px 0 44px;
+      border-radius: 15px;
+      padding: 10px;
+      display: flex;
+      gap: 8px;
+      overflow-x: auto;
+      scrollbar-width: none;
+    }
+    .jumpbar::-webkit-scrollbar { display: none; }
+    .jumpbar a { white-space: nowrap; text-decoration: none; color: var(--muted); padding: 8px 12px; border-radius: 8px; font-size: 14px; font-weight: 600; }
+    .jumpbar a:hover { background: var(--paper-2); color: var(--ink); }
+
+    section { scroll-margin-top: 82px; margin-top: 68px; }
+    .section-head { display: flex; justify-content: space-between; align-items: end; gap: 24px; margin-bottom: 22px; }
+    h2 { margin: 0; font-size: clamp(28px, 4vw, 44px); line-height: 1.05; letter-spacing: -.025em; }
+    .section-head > p { max-width: 470px; margin: 0; color: var(--muted); }
+
+    .signal-strip { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+    .signal-card { border-radius: var(--radius-md); padding: 24px; position: relative; overflow: hidden; }
+    .signal-card::before { content:""; display:block; width: 42px; height: 5px; border-radius: 5px; margin-bottom: 18px; background: var(--tone); }
+    .signal-card[data-tone="green"] { --tone: var(--green); }
+    .signal-card[data-tone="orange"] { --tone: var(--orange); }
+    .signal-card[data-tone="blue"] { --tone: var(--blue); }
+    .signal-card .num { font: 600 12px/1 "IBM Plex Mono", monospace; color: var(--muted); }
+    .signal-card h3 { margin: 9px 0 7px; font-size: 21px; line-height: 1.18; }
+    .signal-card p { margin: 0; color: var(--muted); font-size: 14px; }
+    .signal-card .tag { display: inline-flex; margin-top: 18px; padding: 5px 8px; border-radius: 5px; background: var(--paper-2); font: 500 11px/1.2 "IBM Plex Mono", monospace; }
+
+    .filterbar { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 18px; }
+    .filterbar button {
+      border: 1px solid var(--line);
+      color: var(--muted);
+      background: var(--paper);
+      border-radius: 999px;
+      padding: 8px 13px;
+      cursor: pointer;
+      font-size: 13px;
+      font-weight: 600;
+    }
+    .filterbar button[aria-pressed="true"] { background: var(--ink); color: var(--paper); border-color: var(--ink); }
+    .source-list { display: grid; gap: 14px; }
+    .source-card { border-radius: var(--radius-md); overflow: hidden; }
+    .source-top { padding: 23px 24px 19px; display: grid; grid-template-columns: 54px minmax(0, 1fr) auto; gap: 18px; align-items: start; }
+    .rank { width: 54px; height: 54px; display: grid; place-items: center; border-radius: 50%; background: var(--paper-2); font: 600 18px/1 "IBM Plex Mono", monospace; }
+    .source-titleline { display: flex; align-items: center; flex-wrap: wrap; gap: 9px; }
+    .source-titleline h3 { margin: 0; font-size: 22px; line-height: 1.2; }
+    .badge { display: inline-flex; align-items: center; gap: 6px; padding: 4px 8px; border-radius: 5px; font: 600 10px/1.2 "IBM Plex Mono", monospace; text-transform: uppercase; letter-spacing: .04em; }
+    .badge.live { color: var(--green); background: var(--green-soft); }
+    .badge.index { color: var(--blue); background: var(--blue-soft); }
+    .badge.blocked { color: var(--red); background: var(--red-soft); }
+    .source-summary { margin: 8px 0 0; color: var(--muted); }
+    .fit { text-align: right; }
+    .fit b { display: block; font: 600 13px/1.2 "IBM Plex Mono", monospace; }
+    .fit span { display: block; font-size: 12px; color: var(--muted); margin-top: 5px; }
+    .source-grid { border-top: 1px solid var(--line); display: grid; grid-template-columns: 1.1fr 1fr 1fr; }
+    .source-grid > div { padding: 18px 22px; min-width: 0; }
+    .source-grid > div + div { border-left: 1px solid var(--line); }
+    .label { display: block; margin-bottom: 7px; color: var(--muted); font: 500 10px/1.2 "IBM Plex Mono", monospace; text-transform: uppercase; letter-spacing: .08em; }
+    .source-grid p { margin: 0; font-size: 14px; }
+    .source-actions { padding: 14px 22px; border-top: 1px solid var(--line); display: flex; flex-wrap: wrap; gap: 10px; align-items: center; background: var(--paper-2); }
+    .source-actions a, .copy-btn { min-height: 38px; display: inline-flex; align-items: center; gap: 8px; border-radius: 8px; padding: 8px 11px; border: 1px solid var(--line-strong); background: var(--paper); color: var(--ink); font: 600 12px/1.2 "IBM Plex Mono", monospace; text-decoration: none; cursor: pointer; }
+    .source-actions a:hover, .copy-btn:hover { border-color: var(--ink); }
+    .source-actions .note { color: var(--muted); font-size: 12px; margin-left: auto; }
+    .source-card[hidden] { display: none; }
+
+    .architecture { border-radius: var(--radius-lg); padding: clamp(22px, 4vw, 40px); }
+    .flow { margin-top: 28px; display: grid; grid-template-columns: 1fr 42px 1fr 42px 1fr; align-items: stretch; }
+    .flow-step { padding: 22px; background: var(--paper-2); border-radius: var(--radius-md); }
+    .flow-step .step-no { color: var(--green); font: 600 12px/1 "IBM Plex Mono", monospace; }
+    .flow-step h3 { margin: 11px 0 7px; font-size: 20px; }
+    .flow-step p { margin: 0; color: var(--muted); font-size: 14px; }
+    .arrow { display: grid; place-items: center; color: var(--orange); font-size: 26px; }
+    .logic { margin-top: 18px; display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
+    .logic pre { margin: 0; white-space: pre-wrap; overflow-wrap: anywhere; background: #0b110e; color: #d7f1e6; padding: 20px; border-radius: 12px; font: 13px/1.65 "IBM Plex Mono", monospace; }
+    .logic .explain { border-left: 4px solid var(--orange); padding: 15px 0 15px 20px; }
+    .logic .explain h3 { margin: 0 0 8px; }
+    .logic .explain p { margin: 0; color: var(--muted); }
+
+    .plan-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+    .day { padding: 26px; border-radius: var(--radius-md); }
+    .day h3 { margin: 0 0 18px; display: flex; align-items: baseline; gap: 10px; font-size: 24px; }
+    .day h3 span { color: var(--muted); font: 500 11px/1.2 "IBM Plex Mono", monospace; }
+    .tasks { list-style: none; padding: 0; margin: 0; display: grid; gap: 16px; }
+    .tasks li { display: grid; grid-template-columns: 28px 1fr; gap: 12px; }
+    .tasks .mark { width: 24px; height: 24px; border-radius: 50%; display: grid; place-items: center; background: var(--green-soft); color: var(--green); font: 600 11px/1 "IBM Plex Mono", monospace; }
+    .tasks b { display: block; margin-bottom: 2px; }
+    .tasks p { margin: 0; color: var(--muted); font-size: 14px; }
+
+    .gaps { border-radius: var(--radius-lg); overflow: hidden; }
+    .gap-row { display: grid; grid-template-columns: 210px 1fr 160px; gap: 20px; padding: 20px 24px; align-items: center; }
+    .gap-row + .gap-row { border-top: 1px solid var(--line); }
+    .gap-row strong { font-size: 15px; }
+    .gap-row p { margin: 0; color: var(--muted); font-size: 14px; }
+    .gap-row .move { color: var(--orange); font: 600 11px/1.4 "IBM Plex Mono", monospace; text-align: right; }
+
+    .truth-box { margin-top: 18px; border: 1px solid var(--orange); background: var(--orange-soft); border-radius: var(--radius-md); padding: 22px 24px; }
+    .truth-box strong { color: var(--orange); }
+    .truth-box p { margin: 6px 0 0; }
+
+    .source-notes { padding: 24px; border-radius: var(--radius-md); }
+    .source-notes p { margin: 0; color: var(--muted); }
+    .source-notes ul { margin: 18px 0 0; padding-left: 20px; display: grid; gap: 8px; }
+    .source-notes a { color: var(--blue); text-decoration-thickness: 1px; text-underline-offset: 3px; overflow-wrap: anywhere; }
+    footer { margin-top: 44px; padding: 18px 2px; color: var(--muted); font-size: 12px; font-family: "IBM Plex Mono", monospace; }
+    .toast { position: fixed; left: 50%; bottom: 24px; transform: translate(-50%, 140%); opacity: 0; background: var(--ink); color: var(--paper); padding: 11px 14px; border-radius: 10px; font: 600 12px/1.3 "IBM Plex Mono", monospace; transition: transform .2s ease, opacity .2s ease; z-index: 50; box-shadow: var(--shadow); }
+    .toast.show { transform: translate(-50%, 0); opacity: 1; }
+
+    @media (max-width: 820px) {
+      .hero { grid-template-columns: 1fr; gap: 24px; }
+      .jumpbar { flex-wrap: wrap; overflow-x: visible; }
+      .jumpbar a { flex: 1 1 132px; text-align: center; }
+      .signal-strip { grid-template-columns: 1fr; }
+      .section-head { align-items: start; flex-direction: column; }
+      .source-top { grid-template-columns: 46px minmax(0, 1fr); }
+      .rank { width: 46px; height: 46px; }
+      .fit { grid-column: 2; text-align: left; display: flex; gap: 8px; align-items: baseline; }
+      .source-grid { grid-template-columns: 1fr; }
+      .source-grid > div + div { border-left: 0; border-top: 1px solid var(--line); }
+      .source-actions .note { width: 100%; margin-left: 0; }
+      .flow { grid-template-columns: 1fr; }
+      .arrow { height: 42px; transform: rotate(90deg); }
+      .logic, .plan-grid { grid-template-columns: 1fr; }
+      .gap-row { grid-template-columns: 1fr; gap: 7px; }
+      .gap-row .move { text-align: left; }
+    }
+    @media (max-width: 540px) {
+      .page { width: min(100% - 20px, 1180px); padding-top: 10px; }
+      .hero { padding: 24px 20px 28px; border-radius: 20px; }
+      h1 { font-size: 42px; }
+      .jumpbar { top: 6px; margin-bottom: 34px; }
+      section { margin-top: 50px; }
+      .source-top { padding: 20px 17px 16px; gap: 12px; }
+      .source-grid > div, .source-actions { padding-left: 17px; padding-right: 17px; }
+      .source-titleline h3 { font-size: 19px; }
+      .source-actions a, .copy-btn { width: 100%; justify-content: center; }
+      .architecture { padding: 20px 16px; }
+      .day { padding: 21px 18px; }
+      .gap-row { padding: 18px; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      html { scroll-behavior: auto; }
+      .toast { transition: none; }
+    }
+  </style>
+</head>
+<body>
+  <main class="page">
+    <header class="hero surface">
+      <div>
+        <p class="hero-kicker">FIU-centered · Miami-Dade · research snapshot Sep 26, 2026</p>
+        <h1>A hazard-aware route is buildable this weekend.</h1>
+        <p class="lede">The strongest demo combines county pothole reports, FDOT crash history, and multiple candidate routes. The data is public and programmatic; the real constraint is freshness, not access.</p>
+      </div>
+      <aside class="verdict" aria-label="Research verdict">
+        <strong>Go with the combo.</strong>
+        <p>Score each candidate route against a precomputed hazard grid, then show “safer” beside “fastest.”</p>
+        <div class="facts">
+          <div class="fact"><b>3</b><span>sources carry the MVP</span></div>
+          <div class="fact"><b>0</b><span>keys for FDOT + county 311</span></div>
+          <div class="fact"><b>1</b><span>billing setup if using Google</span></div>
+        </div>
+      </aside>
+    </header>
+
+    <nav class="jumpbar surface" aria-label="Page sections">
+      <a href="#stack">Weekend stack</a>
+      <a href="#sources">Source matrix</a>
+      <a href="#architecture">Architecture</a>
+      <a href="#plan">Build plan</a>
+      <a href="#gaps">Gaps & caveats</a>
+      <a href="#references">References</a>
+    </nav>
+
+    <section id="stack">
+      <div class="section-head">
+        <div><p class="eyebrow">Recommended stack</p><h2>The three-source MVP</h2></div>
+        <p>Two open government feeds supply hazards. One routing layer supplies route geometry. Your code owns the risk score.</p>
+      </div>
+      <div class="signal-strip">
+        <article class="signal-card surface" data-tone="green">
+          <span class="num">01 / CRASH HISTORY</span>
+          <h3>FDOT Crashes_All</h3>
+          <p>All-severity, geolocated Florida crashes. Pull Miami-Dade once, then aggregate into static hotspot cells.</p>
+          <span class="tag">VERIFIED LIVE · NO KEY</span>
+        </article>
+        <article class="signal-card surface" data-tone="orange">
+          <span class="num">02 / ROAD DEFECTS</span>
+          <h3>Miami-Dade 311</h3>
+          <p>Ticket-level road complaints with coordinates, status, and dates. Best public pothole proxy around FIU.</p>
+          <span class="tag">VERIFIED LIVE · NO KEY</span>
+        </article>
+        <article class="signal-card surface" data-tone="blue">
+          <span class="num">03 / ROUTE GEOMETRY</span>
+          <h3>Google Routes or OSRM</h3>
+          <p>Request alternatives, sample their polylines, and choose the lowest-risk option. Google does not avoid custom hazards for you.</p>
+          <span class="tag">GOOGLE KEY OR OPEN ALTERNATIVE</span>
+        </article>
+      </div>
+    </section>
+
+    <section id="sources">
+      <div class="section-head">
+        <div><p class="eyebrow">Source matrix</p><h2>What is actually usable</h2></div>
+        <p>Filter by role. “Verified live” means the research session fetched the service or official page successfully on Sep 26, 2026.</p>
+      </div>
+      <div class="filterbar" role="group" aria-label="Filter data sources">
+        <button type="button" data-filter="all" aria-pressed="true">All sources</button>
+        <button type="button" data-filter="mvp" aria-pressed="false">Use this weekend</button>
+        <button type="button" data-filter="backup" aria-pressed="false">Backup / context</button>
+        <button type="button" data-filter="blocked" aria-pressed="false">Skip</button>
+      </div>
+      <div class="source-list">
+        <article class="source-card surface" data-group="mvp">
+          <div class="source-top">
+            <div class="rank">01</div>
+            <div>
+              <div class="source-titleline"><h3>FDOT Crashes_All</h3><span class="badge live">● verified live</span></div>
+              <p class="source-summary">The statistical-hotspot backbone: roughly 3.3 million statewide crash points across 2011–2019, with 2019 partial and 2018 the latest full year.</p>
+            </div>
+            <div class="fit"><b>BEST FIT</b><span>crash risk</span></div>
+          </div>
+          <div class="source-grid">
+            <div><span class="label">Useful fields</span><p>FDOT and officer coordinates, crash date/time, county, roadway and intersection names, route identifiers, functional class.</p></div>
+            <div><span class="label">Access</span><p>Public ArcGIS REST. Query and export CSV, GeoJSON, shapefile. No key. Paginate past the 1,000-record limit.</p></div>
+            <div><span class="label">Caveat</span><p>Excellent for slow-changing hotspots, not current incidents. Dedicated layers cover fatalities, injuries, pedestrians, speeding, work zones, and more.</p></div>
+          </div>
+          <div class="source-actions">
+            <a href="https://gis.fdot.gov/arcgis/rest/services/Crashes_All/FeatureServer" target="_blank" rel="noopener noreferrer">Open FeatureServer ↗</a>
+            <button class="copy-btn" type="button" data-copy="https://gis.fdot.gov/arcgis/rest/services/Crashes_All/FeatureServer">Copy endpoint</button>
+            <span class="note">Miami-Dade filter: COUNTY_TXT='MIAMI-DADE'</span>
+          </div>
+        </article>
+
+        <article class="source-card surface" data-group="mvp">
+          <div class="source-top">
+            <div class="rank">02</div>
+            <div>
+              <div class="source-titleline"><h3>Miami-Dade 311 · 2023</h3><span class="badge live">● verified live</span></div>
+              <p class="source-summary">The best public pothole and road-defect proxy: ticket-level requests with latitude, longitude, dates, priority, and open/closed status.</p>
+            </div>
+            <div class="fit"><b>BEST FIT</b><span>potholes</span></div>
+          </div>
+          <div class="source-grid">
+            <div><span class="label">Useful fields</span><p>issue_type, issue_description, ticket status, created/updated/closed timestamps, street address, city, priority, latitude and longitude.</p></div>
+            <div><span class="label">Access</span><p>Public ArcGIS REST. Query and extract CSV, GeoJSON, shapefile or KML. No key. Paginate beyond 1,000 rows.</p></div>
+            <div><span class="label">Caveat</span><p>Latest snapshot is 2023, county-maintained work emphasis, approximate locations, BETA. Probe exact pothole issue codes before the bulk pull.</p></div>
+          </div>
+          <div class="source-actions">
+            <a href="https://services.arcgis.com/8Pc9XBTAsYuxx9Ny/arcgis/rest/services/data_311_2023/FeatureServer" target="_blank" rel="noopener noreferrer">Open FeatureServer ↗</a>
+            <button class="copy-btn" type="button" data-copy="https://services.arcgis.com/8Pc9XBTAsYuxx9Ny/arcgis/rest/services/data_311_2023/FeatureServer">Copy endpoint</button>
+            <span class="note">FIU Modesto Maidique is in the covered unincorporated area</span>
+          </div>
+        </article>
+
+        <article class="source-card surface" data-group="mvp">
+          <div class="source-top">
+            <div class="rank">03</div>
+            <div>
+              <div class="source-titleline"><h3>Google Maps Platform</h3><span class="badge live">● pricing verified</span></div>
+              <p class="source-summary">Routes supplies candidate polylines; Roads can supply speed limits; Places or Geocoding handles destinations. The hazard penalty still belongs to your app.</p>
+            </div>
+            <div class="fit"><b>ROUTING</b><span>geometry + map</span></div>
+          </div>
+          <div class="source-grid">
+            <div><span class="label">Useful pieces</span><p>Routes or legacy Directions with alternatives, Roads snap-to-road and speed limits, Places/Geocoding, Maps JavaScript SDK.</p></div>
+            <div><span class="label">Access</span><p>Billing account and API key required. Official pricing page says new customers get a $300 trial credit.</p></div>
+            <div><span class="label">Caveat</span><p>Review caching terms. Verify speedLimits access on the trial key. Roads endpoints appear in the Pro tier.</p></div>
+          </div>
+          <div class="source-actions">
+            <a href="https://mapsplatform.google.com/pricing" target="_blank" rel="noopener noreferrer">Pricing ↗</a>
+            <a href="https://developers.google.com/maps/documentation/roads/speed-limits" target="_blank" rel="noopener noreferrer">Speed limits docs ↗</a>
+            <span class="note">No-billing fallback: OSRM/Valhalla + Leaflet + OpenStreetMap</span>
+          </div>
+        </article>
+
+        <article class="source-card surface" data-group="backup">
+          <div class="source-top">
+            <div class="rank">04</div>
+            <div>
+              <div class="source-titleline"><h3>NHTSA FARS</h3><span class="badge index">index-corroborated</span></div>
+              <p class="source-summary">A nationwide census of fatal crashes, current through 2024 in the researched source. Useful as a severity overlay, not the sole local risk model.</p>
+            </div>
+            <div class="fit"><b>OPTIONAL</b><span>fatal overlay</span></div>
+          </div>
+          <div class="source-grid">
+            <div><span class="label">Useful fields</span><p>Crash date/time, state/county/city, coordinates, roadway class, weather, lighting, posted speed in vehicle data, KABCO injury severity in person data.</p></div>
+            <div><span class="label">Access</span><p>Annual bulk CSV ZIPs. Filter Florida state 12 and Miami-Dade county 086 in pandas or DuckDB.</p></div>
+            <div><span class="label">Caveat</span><p>Fatal crashes only. The bulk-file URL pattern was corroborated but not re-verified live because the listing returned 403.</p></div>
+          </div>
+          <div class="source-actions">
+            <a href="https://www.nhtsa.gov/research-data/fatality-analysis-reporting-system-fars" target="_blank" rel="noopener noreferrer">Official FARS page ↗</a>
+            <span class="note">Add Sunday only if the core route scorer already works</span>
+          </div>
+        </article>
+
+        <article class="source-card surface" data-group="backup">
+          <div class="source-top">
+            <div class="rank">05</div>
+            <div>
+              <div class="source-titleline"><h3>City of Miami 311</h3><span class="badge index">follow-up lead</span></div>
+              <p class="source-summary">The official 2025 city data inventory lists public, daily ArcGIS point data for 311 requests since 2015. The actual layer URL was not verified.</p>
+            </div>
+            <div class="fit"><b>FOLLOW UP</b><span>city-proper gap</span></div>
+          </div>
+          <div class="source-grid">
+            <div><span class="label">Potential role</span><p>Fill the City of Miami gap left by the county dataset, which generally excludes municipal requests not owned by county staff.</p></div>
+            <div><span class="label">Access</span><p>Listed as public ArcGIS Cloud point features with daily updates.</p></div>
+            <div><span class="label">Caveat</span><p>Inventory listing only. Do not build a dependency on it until the live layer is found and queried.</p></div>
+          </div>
+          <div class="source-actions">
+            <a href="https://www.miami.gov/files/assets/public/v/1/document-resources/pdf-docs/data/city-of-miami-data-inventory-2025_508.pdf" target="_blank" rel="noopener noreferrer">Open city inventory ↗</a>
+          </div>
+        </article>
+
+        <article class="source-card surface" data-group="backup">
+          <div class="source-top">
+            <div class="rank">06</div>
+            <div>
+              <div class="source-titleline"><h3>Miami-Dade Vision Zero</h3><span class="badge index">context only</span></div>
+              <p class="source-summary">A county High-Injury Network and crash-map program that validates the pitch and methodology, but no open record-level feed was found.</p>
+            </div>
+            <div class="fit"><b>CONTEXT</b><span>method validation</span></div>
+          </div>
+          <div class="source-grid">
+            <div><span class="label">Useful material</span><p>The 2024 executive summary includes a High-Injury Network map of the top 40 segments.</p></div>
+            <div><span class="label">Coverage</span><p>County program launched in 2021; reporting references GIS crash data for 2018–2022.</p></div>
+            <div><span class="label">Caveat</span><p>Use in the pitch deck, not in the ingestion pipeline. Your FDOT hotspot grid recreates the programmatic idea.</p></div>
+          </div>
+          <div class="source-actions">
+            <a href="https://www.miamidade.gov/resources/transportation_publicworks/documents/2024-vision-zero-executive-summary.pdf" target="_blank" rel="noopener noreferrer">Executive summary ↗</a>
+          </div>
+        </article>
+
+        <article class="source-card surface" data-group="blocked">
+          <div class="source-top">
+            <div class="rank">×</div>
+            <div>
+              <div class="source-titleline"><h3>Signal Four / FLHSMV / CRSS</h3><span class="badge blocked">skip for MVP</span></div>
+              <p class="source-summary">These paths either need pre-approval, sell records individually, or do not support local hotspot inference.</p>
+            </div>
+            <div class="fit"><b>NO-GO</b><span>this weekend</span></div>
+          </div>
+          <div class="source-grid">
+            <div><span class="label">Signal Four</span><p>Record downloads require pre-approval for non-FDOT staff. The public traffic safety dashboard is not a bulk record feed.</p></div>
+            <div><span class="label">FLHSMV</span><p>Individual crash reports cost $10 each. Its public dashboard is summary-only.</p></div>
+            <div><span class="label">CRSS</span><p>Roughly 50,000 sampled crashes per year nationally; not county-representative for Miami-Dade.</p></div>
+          </div>
+          <div class="source-actions">
+            <a href="https://www.flhsmv.gov/traffic-crash-reports/" target="_blank" rel="noopener noreferrer">FLHSMV overview ↗</a>
+            <a href="https://fdotwww.blob.core.windows.net/sitefinity/docs/default-source/safety/11a-safetyengineering/crash-data/crash-data-process_v18.pdf?sfvrsn=311253ee_1" target="_blank" rel="noopener noreferrer">FDOT crash-data process ↗</a>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <section id="architecture" class="architecture surface">
+      <div class="section-head">
+        <div><p class="eyebrow">Suggested architecture</p><h2>Precompute hazards. Score routes fast.</h2></div>
+        <p>Do not call FDOT or county 311 on every route request. Pull once, normalize once, and serve a small static risk layer.</p>
+      </div>
+      <div class="flow" aria-label="Data processing flow">
+        <article class="flow-step"><span class="step-no">STEP 1</span><h3>Ingest</h3><p>Paginate Miami-Dade crashes and pothole-like 311 records. Retain coordinates, dates, severity/status, and source IDs.</p></article>
+        <div class="arrow" aria-hidden="true">→</div>
+        <article class="flow-step"><span class="step-no">STEP 2</span><h3>Aggregate</h3><p>Bin points into a geographic grid, weight serious crashes more heavily, and save compact GeoJSON or JSON.</p></article>
+        <div class="arrow" aria-hidden="true">→</div>
+        <article class="flow-step"><span class="step-no">STEP 3</span><h3>Compare</h3><p>Request alternate routes, sample each polyline against hazard cells, and rank safety against added travel time.</p></article>
+      </div>
+      <div class="logic">
+        <pre><code>routeRisk = Σ(
+  crashDensity × severityWeight
+  + potholeDensity × defectWeight
+)
+
+recommendation = lowestRisk(
+  candidateRoutes
+)</code></pre>
+        <div class="explain">
+          <h3>Keep the claim honest</h3>
+          <p>Call it a <strong>historical hazard score</strong>, not a guarantee of safety. Crash history ends at the latest full FDOT year, 2018; county road complaints end at the 2023 snapshot.</p>
+        </div>
+      </div>
+    </section>
+
+    <section id="plan">
+      <div class="section-head">
+        <div><p class="eyebrow">Weekend plan</p><h2>Sequence the risk out of the build</h2></div>
+        <p>Data first, route display second, polish last. The biggest avoidable failure is spending Saturday on map styling before the pipeline works.</p>
+      </div>
+      <div class="plan-grid">
+        <article class="day surface">
+          <h3>Saturday <span>CORE PIPELINE</span></h3>
+          <ol class="tasks">
+            <li><span class="mark">1</span><div><b>Set up routing early</b><p>Create the Google billing/key setup first, or commit to OSRM/Valhalla immediately.</p></div></li>
+            <li><span class="mark">2</span><div><b>Pull and shrink FDOT data</b><p>Fetch Miami-Dade rows, then aggregate to hazard cells. The research estimate is about two hours.</p></div></li>
+            <li><span class="mark">3</span><div><b>Probe the 311 taxonomy</b><p>Run a distinct-values query, confirm pothole-like issue types, and combine with issue-description text search.</p></div></li>
+            <li><span class="mark">4</span><div><b>Draw alternate routes</b><p>Get at least two candidates between the same origin and destination before tuning any score.</p></div></li>
+          </ol>
+        </article>
+        <article class="day surface">
+          <h3>Sunday <span>DEMO + POLISH</span></h3>
+          <ol class="tasks">
+            <li><span class="mark">5</span><div><b>Score the candidates</b><p>Sample route geometry against the grid and expose both hazard score and added travel time.</p></div></li>
+            <li><span class="mark">6</span><div><b>Make the tradeoff visible</b><p>Show “fastest” and “lower historical risk” side by side. Explain why the recommendation changed.</p></div></li>
+            <li><span class="mark">7</span><div><b>Add one credibility layer</b><p>Optional: FARS fatal-crash overlay or Vision Zero comparison, only after the main flow is stable.</p></div></li>
+            <li><span class="mark">8</span><div><b>State the limits in the demo</b><p>Historical crashes, 2023 road complaints, county coverage emphasis, and no guarantee of present road conditions.</p></div></li>
+          </ol>
+        </article>
+      </div>
+    </section>
+
+    <section id="gaps">
+      <div class="section-head">
+        <div><p class="eyebrow">Gaps & open questions</p><h2>Know what not to promise</h2></div>
+        <p>These are genuine data gaps from the research, not implementation bugs.</p>
+      </div>
+      <div class="gaps surface">
+        <div class="gap-row"><strong>Exact pothole issue codes</strong><p>The 311 schema is verified, but the exact issue_type values still need one distinct-values query.</p><span class="move">PROBE FIRST</span></div>
+        <div class="gap-row"><strong>Live City of Miami 311 URL</strong><p>The city inventory says the daily public layer exists; the endpoint was not verified.</p><span class="move">OPTIONAL LOOKUP</span></div>
+        <div class="gap-row"><strong>School-zone geometry</strong><p>No public Miami-Dade polygon or point dataset was found. Nearby school places are only a proxy.</p><span class="move">LABEL AS PROXY</span></div>
+        <div class="gap-row"><strong>Bulk speed limits</strong><p>No open per-segment FDOT download was found. Google Roads or OpenStreetMap maxspeed tags are the practical options.</p><span class="move">VERIFY ACCESS</span></div>
+        <div class="gap-row"><strong>Current road conditions</strong><p>The strongest county dataset is a 2023 snapshot. Do not market the route as real-time pothole avoidance.</p><span class="move">USE “HISTORICAL”</span></div>
+      </div>
+      <div class="truth-box">
+        <strong>Best pitch language:</strong>
+        <p>“We rank alternate routes using public crash history and reported road-defect density, then explain the safety/time tradeoff.”</p>
+      </div>
+    </section>
+
+    <section id="references">
+      <div class="section-head">
+        <div><p class="eyebrow">Primary references</p><h2>Source trail</h2></div>
+        <p>All facts above preserve the research report’s verification status and caveats.</p>
+      </div>
+      <div class="source-notes surface">
+        <p>Research snapshot conducted Sep 26, 2026. Government services may change after that date.</p>
+        <ul>
+          <li><a href="https://gis.fdot.gov/arcgis/rest/services/Crashes_All/FeatureServer" target="_blank" rel="noopener noreferrer">FDOT Crashes_All ArcGIS REST FeatureServer</a></li>
+          <li><a href="https://services.arcgis.com/8Pc9XBTAsYuxx9Ny/arcgis/rest/services/data_311_2023/FeatureServer" target="_blank" rel="noopener noreferrer">Miami-Dade County 311 Service Requests, 2023 FeatureServer</a></li>
+          <li><a href="https://www.arcgis.com/sharing/rest/content/items/6fce6d69cdd8447389894138444aea2d?f=pjson" target="_blank" rel="noopener noreferrer">Miami-Dade 311 ArcGIS item metadata</a></li>
+          <li><a href="https://www.nhtsa.gov/research-data/fatality-analysis-reporting-system-fars" target="_blank" rel="noopener noreferrer">NHTSA Fatality Analysis Reporting System</a></li>
+          <li><a href="https://mapsplatform.google.com/pricing" target="_blank" rel="noopener noreferrer">Google Maps Platform pricing</a></li>
+          <li><a href="https://developers.google.com/maps/documentation/roads/speed-limits" target="_blank" rel="noopener noreferrer">Google Roads API speed limits documentation</a></li>
+          <li><a href="https://www.miamidade.gov/resources/transportation_publicworks/documents/2024-vision-zero-executive-summary.pdf" target="_blank" rel="noopener noreferrer">Miami-Dade Vision Zero 2024 Executive Summary</a></li>
+          <li><a href="https://www.flhsmv.gov/traffic-crash-reports/" target="_blank" rel="noopener noreferrer">FLHSMV traffic crash reports overview</a></li>
+        </ul>
+      </div>
+    </section>
+
+    <footer>Decision brief · public data for a Miami-Dade hazard-aware routing hack</footer>
+  </main>
+  <div class="toast" role="status" aria-live="polite">Endpoint copied</div>
+  <script>
+    (function () {
+      var filterButtons = document.querySelectorAll('[data-filter]');
+      var cards = document.querySelectorAll('.source-card[data-group]');
+      filterButtons.forEach(function (button) {
+        button.addEventListener('click', function () {
+          var filter = button.getAttribute('data-filter');
+          filterButtons.forEach(function (item) {
+            item.setAttribute('aria-pressed', item === button ? 'true' : 'false');
+          });
+          cards.forEach(function (card) {
+            card.hidden = filter !== 'all' && card.getAttribute('data-group') !== filter;
+          });
+        });
+      });
+
+      var toast = document.querySelector('.toast');
+      var toastTimer;
+      document.querySelectorAll('[data-copy]').forEach(function (button) {
+        button.addEventListener('click', function () {
+          var value = button.getAttribute('data-copy');
+          var done = function () {
+            toast.textContent = 'Endpoint copied';
+            toast.classList.add('show');
+            clearTimeout(toastTimer);
+            toastTimer = setTimeout(function () { toast.classList.remove('show'); }, 1800);
+          };
+          if (navigator.clipboard && navigator.clipboard.writeText) {
+            navigator.clipboard.writeText(value).then(done).catch(function () {
+              fallbackCopy(value, done);
+            });
+          } else {
+            fallbackCopy(value, done);
+          }
+        });
+      });
+
+      function fallbackCopy(value, callback) {
+        var textarea = document.createElement('textarea');
+        textarea.value = value;
+        textarea.setAttribute('readonly', '');
+        textarea.style.position = 'fixed';
+        textarea.style.opacity = '0';
+        document.body.appendChild(textarea);
+        textarea.select();
+        try { document.execCommand('copy'); callback(); }
+        catch (error) {
+          toast.textContent = 'Copy unavailable';
+          toast.classList.add('show');
+          clearTimeout(toastTimer);
+          toastTimer = setTimeout(function () { toast.classList.remove('show'); }, 1800);
+        }
+        document.body.removeChild(textarea);
+      }
+    })();
+  </script>
+</body>
+</html>
