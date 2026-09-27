@@ -1,0 +1,189 @@
+{
+  "generated_at": "2026-09-27T01:56:29.242781-04:00",
+  "source": "Google Routes API: duration (traffic-aware) vs staticDuration (free-flow)",
+  "corridors": {
+    "FIU -> South Beach": {
+      "origin": {
+        "lat": 25.7562465,
+        "lng": -80.3755401
+      },
+      "destination": {
+        "lat": 25.7745937,
+        "lng": -80.13195189999999
+      },
+      "probes": [
+        {
+          "label": "Right now",
+          "departure": "now",
+          "duration_s": 1586,
+          "static_s": 1784,
+          "congestion": 0.89
+        },
+        {
+          "label": "Mon 8am (AM rush)",
+          "departure": "2026-09-28T08:00:00-04:00",
+          "duration_s": 2872,
+          "static_s": 1784,
+          "congestion": 1.61
+        },
+        {
+          "label": "Mon 12pm (midday)",
+          "departure": "2026-09-28T12:00:00-04:00",
+          "duration_s": 2023,
+          "static_s": 1784,
+          "congestion": 1.13
+        },
+        {
+          "label": "Mon 6pm (PM rush)",
+          "departure": "2026-09-28T18:00:00-04:00",
+          "duration_s": 1858,
+          "static_s": 1784,
+          "congestion": 1.04
+        },
+        {
+          "label": "Fri 5pm (Fri rush)",
+          "departure": "2026-10-02T17:00:00-04:00",
+          "duration_s": 2009,
+          "static_s": 1784,
+          "congestion": 1.13
+        },
+        {
+          "label": "Fri 8pm (Fri evening)",
+          "departure": "2026-10-02T20:00:00-04:00",
+          "duration_s": 1761,
+          "static_s": 1784,
+          "congestion": 0.99
+        },
+        {
+          "label": "Sat 10am (weekend)",
+          "departure": "2026-10-03T10:00:00-04:00",
+          "duration_s": 1822,
+          "static_s": 1784,
+          "congestion": 1.02
+        }
+      ]
+    },
+    "Brickell -> Doral": {
+      "origin": {
+        "lat": 25.7662334,
+        "lng": -80.190785
+      },
+      "destination": {
+        "lat": 25.7842446,
+        "lng": -80.3685836
+      },
+      "probes": [
+        {
+          "label": "Right now",
+          "departure": "now",
+          "duration_s": 1054,
+          "static_s": 1227,
+          "congestion": 0.86
+        },
+        {
+          "label": "Mon 8am (AM rush)",
+          "departure": "2026-09-28T08:00:00-04:00",
+          "duration_s": 1279,
+          "static_s": 1227,
+          "congestion": 1.04
+        },
+        {
+          "label": "Mon 12pm (midday)",
+          "departure": "2026-09-28T12:00:00-04:00",
+          "duration_s": 1329,
+          "static_s": 1227,
+          "congestion": 1.08
+        },
+        {
+          "label": "Mon 6pm (PM rush)",
+          "departure": "2026-09-28T18:00:00-04:00",
+          "duration_s": 1885,
+          "static_s": 1227,
+          "congestion": 1.54
+        },
+        {
+          "label": "Fri 5pm (Fri rush)",
+          "departure": "2026-10-02T17:00:00-04:00",
+          "duration_s": 2305,
+          "static_s": 1227,
+          "congestion": 1.88
+        },
+        {
+          "label": "Fri 8pm (Fri evening)",
+          "departure": "2026-10-02T20:00:00-04:00",
+          "duration_s": 1241,
+          "static_s": 1227,
+          "congestion": 1.01
+        },
+        {
+          "label": "Sat 10am (weekend)",
+          "departure": "2026-10-03T10:00:00-04:00",
+          "duration_s": 1214,
+          "static_s": 1227,
+          "congestion": 0.99
+        }
+      ]
+    },
+    "MIA Airport -> Wynwood": {
+      "origin": {
+        "lat": 25.7923496,
+        "lng": -80.28230590000001
+      },
+      "destination": {
+        "lat": 25.8010178,
+        "lng": -80.1993841
+      },
+      "probes": [
+        {
+          "label": "Right now",
+          "departure": "now",
+          "duration_s": 837,
+          "static_s": 957,
+          "congestion": 0.87
+        },
+        {
+          "label": "Mon 8am (AM rush)",
+          "departure": "2026-09-28T08:00:00-04:00",
+          "duration_s": 1088,
+          "static_s": 957,
+          "congestion": 1.14
+        },
+        {
+          "label": "Mon 12pm (midday)",
+          "departure": "2026-09-28T12:00:00-04:00",
+          "duration_s": 968,
+          "static_s": 957,
+          "congestion": 1.01
+        },
+        {
+          "label": "Mon 6pm (PM rush)",
+          "departure": "2026-09-28T18:00:00-04:00",
+          "duration_s": 977,
+          "static_s": 957,
+          "congestion": 1.02
+        },
+        {
+          "label": "Fri 5pm (Fri rush)",
+          "departure": "2026-10-02T17:00:00-04:00",
+          "duration_s": 1025,
+          "static_s": 957,
+          "congestion": 1.07
+        },
+        {
+          "label": "Fri 8pm (Fri evening)",
+          "departure": "2026-10-02T20:00:00-04:00",
+          "duration_s": 960,
+          "static_s": 957,
+          "congestion": 1.0
+        },
+        {
+          "label": "Sat 10am (weekend)",
+          "departure": "2026-10-03T10:00:00-04:00",
+          "duration_s": 917,
+          "static_s": 957,
+          "congestion": 0.96
+        }
+      ]
+    }
+  }
+}
