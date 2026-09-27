@@ -180,21 +180,22 @@
     .route-icon, .route-icon svg { width:25px; height:25px; }
     .comfort-pill { padding:5px 6px; font-size:10px; }
   }
-  @media (max-width: 700px) and (orientation: landscape) {
-    #panel { max-height:48vh; }
+  @media (orientation: landscape) and (max-height: 500px) and (max-width: 950px) {
+    #topbar { top:max(8px, env(safe-area-inset-top)); left:8px; right:8px; }
     #topbar .bar { flex-wrap:nowrap; gap:5px; padding:6px; }
     .addr-field { flex:1 1 150px; padding-left:8px; }
     .addr-field input { font-size:12px; }
     .trip-arrow { display:inline; font-size:14px; }
-    #timePill { padding:6px 8px; font-size:10px; }
-    #legend { top:56px; bottom:auto; right:8px; width:min(400px, calc(100vw - 16px)); padding:5px 8px; font-size:9px; line-height:1.2; }
+    #timePill { margin-left:auto; padding:6px 8px; font-size:10px; }
+    #panel { top:auto; bottom:max(8px, env(safe-area-inset-bottom)); left:8px; right:8px; width:auto; max-height:48vh; }
+    #legend { top:64px; bottom:auto; right:8px; width:min(400px, calc(100vw - 16px)); padding:5px 8px; font-size:9px; line-height:1.2; }
     #legend .legend-head { margin-bottom:2px; font-size:9px; }
     .legend-grid { grid-template-columns:repeat(3, minmax(0, 1fr)); gap:2px 5px; }
     .dot { width:7px; height:7px; margin-right:4px; }
     .leaflet-bottom { bottom:calc(48vh + 20px + env(safe-area-inset-bottom)); }
     .brand-block { display:none; }
   }
-  @media (max-height: 500px) and (min-width: 701px) {
+  @media (max-height: 500px) and (min-width: 951px) {
     #panel { top:8px; bottom:8px; }
     .brand-block { padding:8px 12px; }
     .brand-block .sub { display:none; }
