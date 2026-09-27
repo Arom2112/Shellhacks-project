@@ -237,7 +237,7 @@
       function fmt(r) {
         return "- duration: " + Math.round((r.duration || 0) / 60) + " min, " +
           "distance: " + ((r.distance || 0) / 1609.34).toFixed(1) + " mi, " +
-          "hazard score: " + Math.round(r.hazard || 0) +
+          "roughness score: " + Math.round(r.hazard || 0) +
           (r.livePenalty ? " (incl. +" + r.livePenalty + " live traffic)" : "") +
           (r.liveHits && r.liveHits.length ? ", live incidents on route: " +
             r.liveHits.slice(0, 3).map(function (h) {
@@ -245,14 +245,16 @@
             }).join("; ") : ", no live incidents on route");
       }
       var prompt =
-        "You are the safety copilot for SafeRoute MIA, a Miami driving-safety app. " +
+        "You are the chauffeur for ComfortRoute MIA, a Miami ride-comfort app. " +
         "Two route options were scored using historical crash data, 311 pothole reports, " +
-        "and LIVE traffic incidents from TomTom. Write a 2-3 sentence briefing for the driver " +
-        "comparing them, then one short line recommending which to take and why. " +
+        "and LIVE traffic incidents from TomTom. Where crashes cluster, rides get roughest. " +
+        "Write a 2-3 sentence briefing for the rider comparing them in a calm, reassuring " +
+        "chauffeur voice, then one short line recommending which to take and why. " +
+        "Discuss comfort only; never use the words safe, safer, safest, or safety. " +
         "Be concrete (name the incident types). No fluff, no disclaimers.\n\n" +
-        "SAFEST ROUTE:\n" + fmt(s) + "\n\nFASTEST ROUTE:\n" + fmt(f) +
+        "SMOOTHEST ROUTE:\n" + fmt(s) + "\n\nFASTEST ROUTE:\n" + fmt(f) +
         (s === f || (s.hazard === f.hazard && s.duration === f.duration)
-          ? "\n\nNote: the safest and fastest route are the same."
+          ? "\n\nNote: the smoothest and fastest route are the same."
           : "");
 
       var url = "https://generativelanguage.googleapis.com/v1beta/models/" +
@@ -282,7 +284,7 @@
       var safe = String(text).replace(/&/g, "&amp;").replace(/</g, "&lt;")
         .replace(/>/g, "&gt;").replace(/\n/g, "<br>");
       return '<div class="route-card ai-brief">' +
-        '<span class="route-head"><span class="route-name">AI Safety Brief</span>' +
+        '<span class="route-head"><span class="route-name">Chauffeur Brief</span>' +
         '<span class="badges"><span class="badge ai">GEMINI</span></span></span>' +
         '<span class="route-meta ai-text">' + safe + "</span></div>";
     }

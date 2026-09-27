@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="color-scheme" content="light dark">
+<link rel="icon" href="data:,">
+<title>ComfortRoute MIA</title>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+<link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.css">
+<link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.Default.css">
+<link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+<div id="map"></div>
+<div id="topbar" aria-label="Current trip">
+  <div class="bar">
+    <div class="addr-field">
+      <span class="trip-dot pickup"></span>
+      <input id="pickupInput" type="text" placeholder="Pickup location" autocomplete="off" aria-label="Pickup location">
+      <div class="addr-suggest" id="pickupSuggest"></div>
+    </div>
+    <span class="trip-arrow" aria-hidden="true">→</span>
+    <div class="addr-field">
+      <span class="trip-dot dropoff"></span>
+      <input id="dropoffInput" type="text" placeholder="Dropoff location" autocomplete="off" aria-label="Dropoff location">
+      <div class="addr-suggest" id="dropoffSuggest"></div>
+    </div>
+    <span id="timePill">Sat, 5 PM</span>
+  </div>
+</div>
+<div id="panel">
+  <div class="brand-block">
+    <div class="logo-row">
+      <svg viewBox="0 0 36 36" width="36" height="36" aria-hidden="true"><rect width="36" height="36" rx="10" fill="#0aa878"/><path d="M7 23c5-11 8 4 12-7s6 3 10-6" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round"/></svg>
+      <span class="logo-word">ComfortRoute <span class="mia">MIA</span></span>
+    </div>
+    <div class="sub">Comfort-aware routing for Miami-Dade &mdash; we predict where rides get rough, so you can pick the smoothest one. Type addresses above, or tap the map to drop pins.</div>
+  </div>
+  <div class="panel-scroll">
+  <div id="results"></div>
+  <button id="routeBtn" disabled>View route details &rarr;</button>
+  <span id="liveBadge" class="live-badge" aria-live="polite"></span>
+  <div id="status"></div>
+  <button id="clearBtn" class="secondary">Clear pins</button>
+
+  <div class="sect">When are you driving?</div>
+  <div id="dayChips"><button>Sun</button><button>Mon</button><button>Tue</button><button>Wed</button><button>Thu</button><button>Fri</button><button class="on">Sat</button></div>
+  <div id="hourRow">
+    <input type="range" id="hourSlider" min="0" max="23" step="1" value="17" aria-label="Driving hour">
+    <span id="hourLbl">5 PM Sat</span>
+  </div>
+  <div class="fine">Comfort is estimated with a prototype proxy from crash patterns, potholes, school activity, and live incidents &mdash; not measured ride vibration.</div>
+
+  <div class="sect">Layers</div>
+  <label class="tgl"><input type="checkbox" id="heatTgl" checked> Rough-ride heatmap</label>
+  <label class="tgl"><input type="checkbox" id="potTgl" checked> Pothole clusters</label>
+  <label class="tgl"><input type="checkbox" id="schoolTgl" checked> School calm zones on routes</label>
+  <label class="tgl"><input type="checkbox" id="holdoutBtn"> Show crashes from 2016–2018</label>
+  <div class="fine" id="holdoutLbl" role="status" aria-live="polite" style="display:none"></div>
+  <div class="fine">School zones appear only where the Smoothest or Fastest route intersects them, on weekdays from 7–9 AM and 2–4 PM. Hours are a prototype, not official flasher schedules.</div>
+
+  <details class="settings">
+    <summary>Settings &amp; data</summary>
+    <div class="settings-body">
+      <div class="stats" id="stats">Loading data...</div>
+      <div class="sect">Routing engine</div>
+      <label class="tgl" style="margin-top:2px">Demo API keys <span style="color:#888">(optional)</span></label>
+      <input id="gkey" class="key-input" type="password" placeholder="Google Routes API key" autocomplete="off">
+      <input id="tomtomKeyInput" class="key-input" type="password" placeholder="TomTom API key (live traffic)" autocomplete="off">
+      <input id="geminiKeyInput" class="key-input" type="password" placeholder="Gemini API key (chauffeur briefing)" autocomplete="off">
+      <div class="fine">Google enables traffic-aware route alternatives; TomTom adds live incidents; Gemini writes a Chauffeur Brief. Keys stay only in this session.</div>
+    </div>
+  </details>
+  </div>
+</div>
+<div id="legend" aria-label="Map legend">
+  <div class="legend-head">LEGEND</div>
+  <div><span class="dot" style="background:#ff5722"></span>Predicted rough-ride zone</div>
+  <div><span class="dot" style="background:#1a237e"></span>Actual crash 2016&ndash;2018</div>
+  <div><span class="dot" style="background:#ff9800"></span>Open pothole report</div>
+  <div><span class="dot" style="background:#7b1fa2"></span>Route-intersecting school zone</div>
+  <div><span class="dot" style="background:#2e9e44"></span>Smoothest route <span class="dot" style="background:#1a73e8;margin-left:8px"></span>Fastest route</div>
+</div>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="https://unpkg.com/leaflet.markercluster@1.5.3/dist/leaflet.markercluster.js"></script>
+<script src="js/saferoute-live.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>
