@@ -55,4 +55,10 @@ paste API keys into the Demo API keys box (session-only, never committed):
 
 ## Team
 
+- **Sebastian Mora** — [@Arom2112](https://github.com/Arom2112) — role (Backend / Tester)
+- **Anthony Miller** — [@AnthonyJM916](https://github.com/AnthonyJM916) — role (API's / Frontend)
+- **Lawrence Capistrano** — [@lawrencecapistrano37](https://github.com/lawrencecapistrano37) — role (Strategy / Ideas / Presentation)
+- **Anthony Miller** — [@AnthonyJM916](https://github.com/AnthonyJM916) — role (Presentation / Narrative / Frontend)
+
+
 Built at ShellHacks 2026, Florida International University.
