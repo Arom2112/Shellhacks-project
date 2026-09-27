@@ -280,17 +280,13 @@ function mergeSchoolZones(points) {
 function refreshSchoolLayer(routeSet) {
   if (schoolLayer) map.removeLayer(schoolLayer);
   schoolLayer = L.layerGroup();
-  const shownRoutes = routeSet || routes;
-  if (!schoolOn || !inSchoolWindow() || !shownRoutes.length) return;
+  if (!schoolOn || !schoolPts || !schoolPts.length) return;
 
-  const relevant = schoolPts.filter(school => shownRoutes.some(rt =>
-    distanceToRouteM(school, rt.geometry.coordinates) <= 250
-  ));
-  const zones = mergeSchoolZones(relevant);
+  const zones = mergeSchoolZones(schoolPts);
   zones.forEach(zone => {
-    L.circle([zone.lat, zone.lon], {radius:zone.radius, color:"#7b1fa2", weight:1.5,
-      fillColor:"#7b1fa2", fillOpacity:0.13, renderer:schoolRenderer})
-      .bindTooltip(`School calm zone Â· ${zone.members.length} school${zone.members.length === 1 ? "" : "s"} on displayed routes`, {sticky:true})
+    L.circle([zone.lat, zone.lon], {radius: zone.radius, color: "#7b1fa2", weight: 1.5,
+      fillColor: "#7b1fa2", fillOpacity: 0.13, renderer: schoolRenderer})
+      .bindTooltip(`School zone · ${zone.members.length} school${zone.members.length === 1 ? "" : "s"}`, {sticky: true})
       .addTo(schoolLayer);
   });
   schoolLayer.addTo(map);
