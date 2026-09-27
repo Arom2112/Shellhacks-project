@@ -154,21 +154,31 @@
     html, body { min-height:100%; height:100%; overflow:hidden; }
     #map { position:fixed; inset:0; height:100%; }
     .map-fallback { inset:0; align-items:start; padding-top:300px; }
-    #topbar { top:max(8px, env(safe-area-inset-top)); left:8px; right:8px; }
+    #topbar { top:max(8px, env(safe-area-inset-top)); left:8px; right:56px; }
     #topbar .bar { flex-wrap:wrap; row-gap:6px; gap:7px; padding:7px; border-radius:14px; }
     .addr-field { flex:1 1 100%; }
     .trip-arrow { display:none; }
     #timePill { margin-left:auto; padding:6px 10px; }
-    #panel { top:auto; bottom:max(8px, env(safe-area-inset-bottom)); left:8px; right:8px; width:auto; max-height:min(56vh, 520px); border-radius:16px; box-shadow:var(--glass-shadow); padding:9px; }
+    #panelToggle {
+      position:fixed; right:8px; top:50%; transform:translateY(-50%); z-index:1100;
+      display:flex; align-items:center; justify-content:center; writing-mode:vertical-rl; text-orientation:mixed;
+      width:38px; height:118px; border:1px solid var(--glass-border); border-radius:14px 0 0 14px;
+      background:var(--glass-bg); color:#172033; font-size:12px; font-weight:800; letter-spacing:.08em; cursor:pointer;
+      box-shadow:var(--glass-shadow); backdrop-filter:blur(20px) saturate(1.35); -webkit-backdrop-filter:blur(20px) saturate(1.35);
+    }
+    #panel {
+      top:auto; bottom:max(8px, env(safe-area-inset-bottom)); left:auto; right:8px; width:min(78vw, 300px); max-height:min(62vh, 500px); height:auto;
+      border-radius:18px 18px 16px 16px; box-shadow:var(--glass-shadow); padding:9px; transition:transform .2s ease, opacity .2s ease; opacity:0; pointer-events:none; transform:translateX(calc(100% + 18px));
+    }
+    #panel[data-open="true"] { opacity:1; pointer-events:auto; transform:translateX(0); }
+    #panel[data-open="false"] { opacity:0; pointer-events:none; }
     .panel-scroll { justify-content:flex-start; }
     .brand-block { padding:10px 12px; }
     .brand-block .sub { display:none; }
     .logo-mark { width:34px; height:34px; }
     .logo-word { font-size:19px; }
-    #legend { top:auto; right:8px; bottom:calc(min(56vh, 520px) + 16px + env(safe-area-inset-bottom)); width:min(286px, calc(100vw - 16px)); padding:8px 10px; }
-    #legend .legend-head { margin-bottom:2px; }
-    .legend-grid { grid-template-columns:1fr 1fr; gap:2px 7px; }
-    .leaflet-bottom { bottom:calc(min(56vh, 520px) + 20px + env(safe-area-inset-bottom)); }
+    #legend { display:none; }
+    .leaflet-bottom { bottom:calc(min(68vh, 560px) + 20px + env(safe-area-inset-bottom)); }
     .leaflet-left { left:8px; }
     .leaflet-right { right:8px; }
     .leaflet-control-attribution { font-size:9px; }
@@ -223,6 +233,7 @@
 </head>
 <body>
 <div id="map"></div>
+<button id="panelToggle" type="button" aria-expanded="false" aria-controls="panel">Filters</button>
 <div id="topbar" aria-label="Current trip">
   <div class="bar">
     <div class="addr-field">
@@ -1307,6 +1318,19 @@ async function addAIBriefing(routeSet, expectedVersion) {
     // Best effort: route cards remain usable if the briefing service is unavailable.
   }
 }
+
+const panelToggle = document.getElementById("panelToggle");
+const panel = document.getElementById("panel");
+const setPanelOpen = (open) => {
+  document.body.classList.toggle("panel-open", open);
+  panel.dataset.open = String(open);
+  panelToggle.setAttribute("aria-expanded", String(open));
+};
+panel.dataset.open = "false";
+panelToggle.addEventListener("click", () => {
+  const isOpen = panel.dataset.open === "true";
+  setPanelOpen(!isOpen);
+});
 
 document.getElementById("routeBtn").onclick = async () => {
   if (!startPin || !endPin || !grid) return;
