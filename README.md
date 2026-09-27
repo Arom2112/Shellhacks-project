@@ -60,5 +60,8 @@ paste API keys into the Demo API keys box (session-only, never committed):
 - **Lawrence Capistrano** — [@lawrencecapistrano37](https://github.com/lawrencecapistrano37) — role (Strategy / Ideas / Presentation)
 - **Anthony Miller** — [@AnthonyJM916](https://github.com/AnthonyJM916) — role (Presentation / Narrative / Frontend)
 
+## Special thanks
+
+- **Shaina Sukhu** - for the brainstorming sessions and for bringing us together as a BC community at ShellHacks.
 
 Built at ShellHacks 2026, Florida International University.
